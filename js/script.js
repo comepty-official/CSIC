@@ -19,7 +19,7 @@ function toast(msg) {
   if (reduceMotion || !('IntersectionObserver' in window)) return;
 
   var targets = document.querySelectorAll(
-    '.section-head, .app, .card, .mini, .download-card, .feedback'
+    '.section-head, .app, .card, .mini, .download-card, .feedback, .gallery-item'
   );
   targets.forEach(function (el, i) {
     el.classList.add('reveal');
@@ -101,6 +101,39 @@ if (bottomImage && imgSlot) {
   });
   if (bottomImage.complete && bottomImage.naturalWidth > 0) {
     imgSlot.style.display = 'block';
+  }
+}
+
+/* ---------- gallery handling ---------- */
+var gallerySection = document.getElementById('gallery');
+var galleryItems = document.querySelectorAll('.gallery-item');
+
+if (gallerySection && galleryItems.length > 0) {
+  gallerySection.style.display = 'none'; // Hide section by default
+  var anyImageLoaded = false;
+
+  galleryItems.forEach(function(item) {
+    var img = item.querySelector('img');
+    if (img) {
+      // Hide the individual picture box if the image fails to load
+      img.addEventListener('error', function() {
+        item.style.display = 'none';
+      });
+      
+      // If the image is already loaded (cached), or loads successfully
+      if (img.complete && img.naturalWidth > 0) {
+        anyImageLoaded = true;
+      } else {
+        img.addEventListener('load', function() {
+          gallerySection.style.display = 'block';
+        });
+      }
+    }
+  });
+
+  // Show the whole gallery section if at least one image is already ready
+  if (anyImageLoaded) {
+    gallerySection.style.display = 'block';
   }
 }
 
